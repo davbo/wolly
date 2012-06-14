@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, WakeonlanActivity!</string>
     <string name="app_name">Wake on LAN</string>
-
+    <string name="machint">MAC Address</string>
+    <string name="addmac">Add MAC Address</string>
 </resources>

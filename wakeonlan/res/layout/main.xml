@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <Spinner
-        android:id="@+id/spin"
+        android:id="@+id/networkspin"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
@@ -14,13 +14,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="MAC Address" />
+        android:hint="@string/machint" />
 
     <Button
         android:id="@+id/sendwol"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:onClick="sendWOL"
-        android:text="Wake on LAN" />
+        android:onClick="addNewMAC"
+        android:text="@string/addmac" />
 
 </LinearLayout>
