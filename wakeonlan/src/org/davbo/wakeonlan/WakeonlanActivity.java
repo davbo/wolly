@@ -1,12 +1,10 @@
 package org.davbo.wakeonlan;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -19,6 +17,7 @@ import android.widget.Spinner;
 public class WakeonlanActivity extends Activity {
     public static final int PORT = 9; 
     private static final String TAG = "WOLActivity";
+    private static final String PREFS_NAME = "WOLLY";
 
     /** Called when the activity is first created. */
     @Override
@@ -34,54 +33,20 @@ public class WakeonlanActivity extends Activity {
         for (WifiConfiguration config : configs) {
 			adapter.add(config.toString());
 		}
-        Spinner spinner = (Spinner)findViewById(R.id.spin);
+        Spinner spinner = (Spinner)findViewById(R.id.networkspin);
         spinner.setAdapter(adapter);
     }
 
-    public void sendWOL(View view) {
+    public void addNewMAC(View view) {
         EditText edit_macaddr = (EditText) findViewById(R.id.macaddr);
-        String macStr = edit_macaddr.getText().toString();      
-        String ipStr = "255.255.255.255";
-
-        try {
-            byte[] macBytes = getMacBytes(macStr);
-            byte[] bytes = new byte[6 + 16 * macBytes.length];
-            for (int i = 0; i < 6; i++) {
-                bytes[i] = (byte) 0xff;
-            }
-            for (int i = 6; i < bytes.length; i += macBytes.length) {
-                System.arraycopy(macBytes, 0, bytes, i, macBytes.length);
-            }
-            
-            InetAddress address = InetAddress.getByName(ipStr);
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, PORT);
-            DatagramSocket socket = new DatagramSocket();
-            socket.send(packet);
-            socket.close();
-            
-            Log.i(TAG, "Wake-on-LAN packet sent.");
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Failed to send Wake-on-LAN packet: + e");
-        }
-        
+        String macStr = edit_macaddr.getText().toString();
+        Spinner spinner = (Spinner)findViewById(R.id.networkspin);
+        String netcfg = (String)spinner.getSelectedItem();
+        Log.i(TAG, "Network conf: "+netcfg);
+        Log.i(TAG, "MAC Address: "+macStr);
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(netcfg, macStr);
+        editor.commit();
     }
-    
-    private static byte[] getMacBytes(String macStr) throws IllegalArgumentException {
-        byte[] bytes = new byte[6];
-        String[] hex = macStr.split("(\\:|\\-)");
-        if (hex.length != 6) {
-            throw new IllegalArgumentException("Invalid MAC address.");
-        }
-        try {
-            for (int i = 0; i < 6; i++) {
-                bytes[i] = (byte) Integer.parseInt(hex[i], 16);
-            }
-        }
-        catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid hex digit in MAC address.");
-        }
-        return bytes;
-    }
-    
 }
